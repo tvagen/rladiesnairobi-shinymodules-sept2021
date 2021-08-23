@@ -1,0 +1,12 @@
+## Load required libraries
+library(shiny)
+library(shiny.fluent)
+library(shiny.react)
+library(shiny.router)
+library(data.table)
+library(plotly)
+library(leaflet)
+library(leafem)
+library(leaflet.extras)
+library(sf)
+library(rKenyaCensus)
