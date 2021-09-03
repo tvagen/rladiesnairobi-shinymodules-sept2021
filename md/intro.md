@@ -54,3 +54,9 @@ Shiny modules are actually not that advanced, but can be used to develop incredi
   - A landing page (home) module
   - A map module showing population by county
   - We will use Microsoft's Fluent UI (shiny.fluent & shiny.react from appsilon.com)
+
+--
+
+The github repository containing the code is here:
+
+https://github.com/tvagen/rladiesnairobi-shinymodules-sept2021
