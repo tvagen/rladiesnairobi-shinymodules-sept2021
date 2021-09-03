@@ -34,22 +34,7 @@ router <- make_router(
 #### Header
 header <- tagList(
     img(src = "https://fvmstatic.s3.amazonaws.com/maps/m/KE-EPS-02-6001.png", class = "logo"),
-    div(Text(variant = "xLarge", "Kenya Census Dashboard"), class = "title"),
-    CommandBar(
-        items = list(
-            CommandBarItem("New", "Add", subitems = list(
-                CommandBarItem("Email message", "Mail", key = "emailMessage", href = "mailto:t.vagen@cgiar.org")
-            )),
-            CommandBarItem("Upload data", "Upload"),
-            CommandBarItem("Share this page", "Share"),
-            CommandBarItem("Resources", "Download")
-        ),
-        farItems = list(
-            CommandBarItem("Grid view", "Tiles", iconOnly = TRUE),
-            CommandBarItem("Info", "Info", iconOnly = TRUE)
-        ),
-        style = list(width = "100%")
-    )
+    div(Text(variant = "xLarge", "Kenya Census Dashboard"), class = "title")
 )
 
 #### Navigation
@@ -152,8 +137,15 @@ app_server <- function(input, output, session) {
     router$server(input, output, session)
     # Your application server logic
 
+    kenya.counties <- rKenyaCensus::KenyaCounties_SHP
+    kenya.counties <- st_as_sf(kenya.counties)
+    kenya.counties <- kenya.counties %>%
+        st_transform(crs = 4326) %>%
+        mutate(Population = as.numeric(as.character(Population)))
+
+
     callModule(mod_home_server, "home_ui_1")
-    callModule(mod_map_server, "map_ui_1")
+    callModule(mod_map_server, "map_ui_1", kenya.counties = kenya.counties)
 }
 
 

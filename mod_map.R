@@ -33,12 +33,22 @@ mod_map_ui <- function(id) {
                                 class = "ms-depth-8",
                                 div(
                                     class = "card",
-                                    h2("Total population by gender in each county"),
+                                    h2("Map of total population by county"),
+                                    "The legend shows which quantile each county falls in",
+                                    leafletOutput(ns("map_pop_counties"), height = "600px", width = "auto")
                                 )
-                            ),
+                            )
+                        ),
+                        div(
+                            class = "ms-Grid-col ms-sm12 ms-md12 ms-lg6",
                             div(
-                                class = "card",
-                                h2("Population density in each county"),
+                                class = "ms-depth-8",
+                                div(
+                                    class = "card",
+                                    h2("Map of population density by county"),
+                                    "The legend shows which quantile each county falls in",
+                                    leafletOutput(ns("map_PD_counties"), height = "600px", width = "auto")
+                                )
                             )
                         )
                     )
@@ -51,37 +61,33 @@ mod_map_ui <- function(id) {
 #' home Server Functions
 #'
 #' @noRd
-mod_map_server <- function(input, output, session) {
+mod_map_server <- function(input, output, session, kenya.counties) {
     ns <- session$ns
 
-    ## Load data
-    ### View(DataCatalogue) to see a list of all the datasets in the library
-    kenya.pop.gender.county <- data.table(V1_T2.2)
-    kenya.pop.area.county <- data.table(V1_T2.4)
-    colnames(kenya.pop.area.county) <- c("County", "Population", "Area", "PopDens") ## Area in sq km
+    kenya.counties <- kenya.counties
 
-    ## Remove spaces in county names
-    kenya.pop.area.county <- kenya.pop.area.county[, County := str_remove_all(County, " ")]
+    ## Creating color palettes (functions)
+    pop.pal <- colorQuantile("YlOrRd", domain = kenya.counties$Population, n = 4)
+    pd.pal <- colorQuantile("YlOrRd", domain = kenya.counties$PD, n = 4)
 
-    output$pop_gender_county <- renderPlotly({
-        kenya.pop.gender.county[County != "Total"] %>%
-            plot_ly(
-                x = ~ reorder(County, -Total), y = ~Male,
-                type = "bar", color = I("blue"), name = "Male population"
-            ) %>%
-            add_bars(
-                x = ~ reorder(County, -Total), y = ~Female,
-                type = "bar", color = I("orange"), name = "Female population"
-            ) %>%
-            layout(xaxis = list(title = "County"), yaxis = list(title = "Population in 2019"))
+    ## Map of population
+    output$map_pop_counties <- renderLeaflet({
+        kenya.counties %>%
+            leaflet() %>%
+            addTiles() %>%
+            addPolygons(stroke = FALSE, fill = TRUE, fillColor = ~ pop.pal(Population), fillOpacity = 0.7) %>%
+            addScaleBar() %>%
+            addLegend(pal = pop.pal, values = ~Population)
     })
 
-    output$pop_dens_county <- renderPlotly({
-        kenya.pop.area.county[County != "Kenya"] %>%
-            plot_ly(
-                x = ~ reorder(County, -PopDens), y = ~PopDens,
-                type = "bar", color = I("#ffa600")
-            )
+    ## Map of population density
+    output$map_PD_counties <- renderLeaflet({
+        kenya.counties %>%
+            leaflet() %>%
+            addTiles() %>%
+            addPolygons(stroke = FALSE, fill = TRUE, fillColor = ~ pd.pal(PD), fillOpacity = 0.7) %>%
+            addScaleBar() %>%
+            addLegend(pal = pd.pal, values = ~PD)
     })
 }
 
