@@ -61,10 +61,15 @@ mod_map_ui <- function(id) {
 #' home Server Functions
 #'
 #' @noRd
-mod_map_server <- function(input, output, session, kenya.counties) {
+mod_map_server <- function(input, output, session) {
     ns <- session$ns
 
-    kenya.counties <- kenya.counties
+    ## Load the map, convert to sf, reproject and mutate field(s) as necessary
+    kenya.counties <- rKenyaCensus::KenyaCounties_SHP
+    kenya.counties <- st_as_sf(kenya.counties)
+    kenya.counties <- kenya.counties %>%
+        st_transform(crs = 4326) %>%
+        mutate(Population = as.numeric(as.character(Population)))
 
     ## Creating color palettes (functions)
     pop.pal <- colorQuantile("YlOrRd", domain = kenya.counties$Population, n = 4)
@@ -75,7 +80,7 @@ mod_map_server <- function(input, output, session, kenya.counties) {
         kenya.counties %>%
             leaflet() %>%
             addTiles() %>%
-            addPolygons(stroke = FALSE, fill = TRUE, fillColor = ~ pop.pal(Population), fillOpacity = 0.7) %>%
+            addPolygons(stroke = FALSE, fill = TRUE, fillColor = ~ pop.pal(Population), fillOpacity = 0.7, label = ~ paste0(kenya.counties$County, ": ", format(Population, big.mark = ","))) %>%
             addScaleBar() %>%
             addLegend(pal = pop.pal, values = ~Population)
     })
@@ -85,7 +90,7 @@ mod_map_server <- function(input, output, session, kenya.counties) {
         kenya.counties %>%
             leaflet() %>%
             addTiles() %>%
-            addPolygons(stroke = FALSE, fill = TRUE, fillColor = ~ pd.pal(PD), fillOpacity = 0.7) %>%
+            addPolygons(stroke = FALSE, fill = TRUE, fillColor = ~ pd.pal(PD), fillOpacity = 0.7, label = ~ paste0(kenya.counties$County, ": ", format(PD, big.mark = ","))) %>%
             addScaleBar() %>%
             addLegend(pal = pd.pal, values = ~PD)
     })
