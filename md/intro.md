@@ -13,6 +13,24 @@ Dr Tor-G. Vågen
 
 04/07/2021
 
+--
+
+### About me...
+
+```r
+> I am not a coder or web developer, but enjoy coding, 
+data visualization and app design
+
+> I am a scientist with a backgroung in soil science, 
+ecology, statistics and remote sensing
+
+> I work at World Agroforestry (ICRAF) in Nairobi, where I lead
+our Spatial Data Science and Applied Learning Lab (SPACIAL)
+
+> I have used R extensively since about 2001, but also enjoy
+working in Python, and dabble a little in Java and JavaScript
+```
+
 ---
 
 ## Shiny modules
